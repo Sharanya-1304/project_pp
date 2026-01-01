@@ -1,0 +1,61 @@
+{
+  "date": "2026-01-01",
+  "timestamp": "2026-01-01T23:59:59Z",
+  "server": {
+    "uptime": "99.9%",
+    "avgResponseTime": "145ms",
+    "maxResponseTime": "890ms",
+    "minResponseTime": "12ms",
+    "requestsPerSecond": 12.5
+  },
+  "database": {
+    "queryCount": 2450,
+    "avgQueryTime": "45ms",
+    "slowQueries": 8,
+    "connectionPool": "28/30"
+  },
+  "api": {
+    "totalRequests": 1081,
+    "successRate": "98.5%",
+    "errorRate": "1.5%",
+    "endpoints": {
+      "/api/auth/login": 156,
+      "/api/auth/signup": 45,
+      "/api/auth/verify-otp": 45,
+      "/api/user/leaderboard": 234,
+      "/api/user/profile": 189,
+      "/api/user/update": 78
+    }
+  },
+  "performance": {
+    "cpuUsage": "34%",
+    "memoryUsage": "52%",
+    "diskUsage": "28%",
+    "networkIn": "234 MB",
+    "networkOut": "567 MB"
+  },
+  "users": {
+    "activeUsers": 15,
+    "totalSessions": 24,
+    "newUsers": 3,
+    "returningUsers": 12
+  },
+  "errors": {
+    "totalErrors": 16,
+    "authErrors": 3,
+    "validationErrors": 8,
+    "serverErrors": 5
+  },
+  "topErrors": [
+    {
+      "error": "Invalid OTP",
+      "count": 3,
+      "lastOccurrence": "2026-01-01T18:45:00Z"
+    },
+    {
+      "error": "Email already exists",
+      "count": 2,
+      "lastOccurrence": "2026-01-01T16:30:00Z"
+    }
+  ]
+}

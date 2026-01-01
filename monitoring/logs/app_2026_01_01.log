@@ -1,0 +1,21 @@
+[INFO] 2026-01-01 10:30:00 - User 'Arjun Kumar' (user_1) logged in from 192.168.1.100
+[INFO] 2026-01-01 10:30:05 - User accessed /dashboard
+[INFO] 2026-01-01 10:35:10 - User accessed /leaderboard
+[INFO] 2026-01-01 10:38:15 - User accessed /profile
+[INFO] 2026-01-01 10:45:20 - User accessed /puzzles
+[INFO] 2026-01-01 10:55:00 - User created post: 'React Hooks Tutorial' (post_1)
+[INFO] 2026-01-01 11:05:00 - User voted on post_5
+[INFO] 2026-01-01 11:45:00 - User 'Arjun Kumar' (user_1) logged out
+[INFO] 2026-01-01 14:30:00 - User 'Arjun Kumar' (user_1) logged in from 192.168.1.100
+[INFO] 2026-01-01 14:35:00 - User accessed /dashboard
+[INFO] 2026-01-01 14:45:00 - User created post: 'Express Middleware Guide' (post_2)
+[INFO] 2026-01-01 15:00:00 - User gave feedback on post_3
+[INFO] 2026-01-01 15:15:00 - User 'Arjun Kumar' (user_1) logged out
+
+[STATS] 2026-01-01 - Total Users Active: 15
+[STATS] 2026-01-01 - Total Sessions: 24
+[STATS] 2026-01-01 - Total Posts Created: 8
+[STATS] 2026-01-01 - Total Votes Given: 12
+[STATS] 2026-01-01 - Total Feedback Given: 3
+[STATS] 2026-01-01 - Average Session Duration: 1 hour 10 minutes
+[STATS] 2026-01-01 - Most Active Page: /puzzles

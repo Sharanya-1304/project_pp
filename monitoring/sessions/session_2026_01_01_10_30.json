@@ -1,0 +1,71 @@
+{
+  "sessionId": "sess_001",
+  "userId": "user_1",
+  "userName": "Arjun Kumar",
+  "email": "arjun@example.com",
+  "loginTime": "2026-01-01T10:30:00Z",
+  "logoutTime": "2026-01-01T11:45:00Z",
+  "duration": "1 hour 15 minutes",
+  "ipAddress": "192.168.1.100",
+  "browser": "Chrome 91.0",
+  "device": "Desktop",
+  "status": "completed",
+  "pages": [
+    {
+      "page": "/dashboard",
+      "timestamp": "2026-01-01T10:30:05Z",
+      "duration": "5 minutes"
+    },
+    {
+      "page": "/leaderboard",
+      "timestamp": "2026-01-01T10:35:10Z",
+      "duration": "3 minutes"
+    },
+    {
+      "page": "/profile",
+      "timestamp": "2026-01-01T10:38:15Z",
+      "duration": "7 minutes"
+    },
+    {
+      "page": "/puzzles",
+      "timestamp": "2026-01-01T10:45:20Z",
+      "duration": "10 minutes"
+    }
+  ],
+  "actions": [
+    {
+      "action": "login",
+      "timestamp": "2026-01-01T10:30:00Z",
+      "details": "User logged in successfully"
+    },
+    {
+      "action": "view_page",
+      "timestamp": "2026-01-01T10:30:05Z",
+      "details": "Viewed Dashboard"
+    },
+    {
+      "action": "create_post",
+      "timestamp": "2026-01-01T10:55:00Z",
+      "details": "Created post: React Hooks Tutorial",
+      "postId": "post_1"
+    },
+    {
+      "action": "vote",
+      "timestamp": "2026-01-01T11:05:00Z",
+      "details": "Voted on post_5",
+      "voteCount": 1
+    },
+    {
+      "action": "logout",
+      "timestamp": "2026-01-01T11:45:00Z",
+      "details": "User logged out"
+    }
+  ],
+  "statistics": {
+    "postsCreated": 1,
+    "votesGiven": 1,
+    "feedbackGiven": 0,
+    "pagesVisited": 4,
+    "actionsPerformed": 5
+  }
+}

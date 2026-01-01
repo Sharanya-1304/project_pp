@@ -11,11 +11,13 @@ export function AppContextProvider({ children }) {
 
   async function loadUser() {
     try {
-      const token = localStorage.getItem("authToken");
+      // Try both token keys for compatibility
+      const token = localStorage.getItem("token") || localStorage.getItem("authToken");
       const storedUser = localStorage.getItem("user");
       
       if (storedUser) {
-        setUser(JSON.parse(storedUser));
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
       } else if (token) {
         const res = await axios.get(`${API_URL}/api/user/profile`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -26,6 +28,7 @@ export function AppContextProvider({ children }) {
     } catch (error) {
       console.error("Load user error:", error);
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
       localStorage.removeItem("authToken");
       setUser(null);
     } finally {
@@ -39,6 +42,7 @@ export function AppContextProvider({ children }) {
 
   function logout() {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     localStorage.removeItem("authToken");
     setUser(null);
   }
@@ -55,7 +59,7 @@ export function AppContextProvider({ children }) {
   }
 
   return (
-    <AppContext.Provider value={{ user, setUser: updateUser, logout, loading, setUserWithToken }}>
+    <AppContext.Provider value={{ user, setUser: updateUser, logout, loading, setUserWithToken, loadUser }}>
       {children}
     </AppContext.Provider>
   );

@@ -1,0 +1,54 @@
+{
+  "date": "2026-01-01",
+  "userId": "user_1",
+  "userName": "Arjun Kumar",
+  "email": "arjun@example.com",
+  "totalSessions": 2,
+  "totalSessionTime": "2 hours 30 minutes",
+  "averageSessionTime": "1 hour 15 minutes",
+  "pagesVisited": 8,
+  "uniquePages": 4,
+  "postsCreated": 2,
+  "votesGiven": 3,
+  "feedbackGiven": 1,
+  "engagement": {
+    "score": 85,
+    "level": "High",
+    "trend": "↑ Increasing"
+  },
+  "mostVisitedPage": "/puzzles",
+  "mostCommonAction": "create_post",
+  "peakActivityTime": "10:30 - 11:45",
+  "deviceStats": {
+    "desktop": 2,
+    "mobile": 0,
+    "tablet": 0
+  },
+  "activities": [
+    {
+      "time": "10:30:00",
+      "action": "login",
+      "page": "/dashboard"
+    },
+    {
+      "time": "10:55:00",
+      "action": "create_post",
+      "page": "/dashboard"
+    },
+    {
+      "time": "11:05:00",
+      "action": "vote",
+      "page": "/leaderboard"
+    },
+    {
+      "time": "14:30:00",
+      "action": "login",
+      "page": "/dashboard"
+    },
+    {
+      "time": "14:45:00",
+      "action": "create_post",
+      "page": "/puzzles"
+    }
+  ]
+}

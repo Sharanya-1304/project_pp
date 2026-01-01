@@ -1,0 +1,158 @@
+{
+  "monitoring": {
+    "name": "CodeHub Monitoring & Analytics System",
+    "version": "1.0.0",
+    "description": "Real-time monitoring, session tracking, and analytics system for CodeHub platform",
+    "backend": {
+      "runtime": "Node.js",
+      "framework": "Express.js",
+      "language": "JavaScript (ES6+)",
+      "modules": {
+        "express": "Web server framework",
+        "fs": "File system - for log storage",
+        "path": "Path utilities",
+        "cors": "Cross-origin requests",
+        "dotenv": "Environment variables"
+      }
+    },
+    "frontend": {
+      "framework": "React 18",
+      "language": "JavaScript (ES6+)",
+      "modules": {
+        "MonitoringService": "Client-side monitoring",
+        "localStorage": "Session storage",
+        "fetch API": "HTTP requests to backend"
+      }
+    },
+    "storage": {
+      "type": "File System Based JSON",
+      "format": "JSON",
+      "locations": {
+        "sessions": "monitoring/sessions/",
+        "analytics": "monitoring/analytics/",
+        "logs": "monitoring/logs/",
+        "metrics": "monitoring/metrics/",
+        "reports": "monitoring/reports/"
+      }
+    },
+    "features": {
+      "session_tracking": {
+        "technology": "MonitoringLogger + MonitoringService",
+        "description": "Tracks user login/logout sessions with full activity logging"
+      },
+      "analytics": {
+        "technology": "JSON file storage + MonitoringLogger",
+        "description": "User behavior, engagement, and activity analytics"
+      },
+      "logging": {
+        "technology": "File system logging (fs module)",
+        "description": "Server and application event logging"
+      },
+      "metrics": {
+        "technology": "MonitoringLogger + JSON storage",
+        "description": "Server performance, API usage, and system metrics"
+      },
+      "reports": {
+        "technology": "JSON + File system",
+        "description": "Daily/weekly activity and performance reports"
+      }
+    },
+    "integrations": {
+      "backend": {
+        "monitoringMiddleware": "Express middleware for request tracking",
+        "MonitoringLogger": "Utility class for centralized logging",
+        "monitoringRoutes": "API endpoints for monitoring events"
+      },
+      "frontend": {
+        "MonitoringService": "Singleton service for client-side tracking",
+        "trackEvent": "Generic event tracking",
+        "trackPageView": "Page navigation tracking",
+        "trackAction": "User action tracking",
+        "trackApiCall": "API request tracking",
+        "trackError": "Error logging"
+      }
+    },
+    "api_endpoints": {
+      "POST /api/monitoring/track": "Track monitoring events",
+      "GET /api/monitoring/stats": "Get monitoring statistics"
+    },
+    "data_format": {
+      "session": {
+        "sessionId": "Unique session identifier",
+        "userId": "User ID",
+        "userName": "User name",
+        "email": "User email",
+        "loginTime": "ISO timestamp",
+        "logoutTime": "ISO timestamp",
+        "duration": "Session duration",
+        "ipAddress": "User IP address",
+        "pages": "Array of visited pages",
+        "actions": "Array of user actions",
+        "statistics": "Engagement statistics"
+      },
+      "analytics": {
+        "date": "Date of analytics",
+        "userId": "User ID",
+        "userName": "User name",
+        "totalSessions": "Number of sessions",
+        "totalSessionTime": "Total time spent",
+        "pagesVisited": "Pages viewed",
+        "postsCreated": "Posts created",
+        "votesGiven": "Votes given",
+        "feedbackGiven": "Feedback given",
+        "engagement": "Engagement metrics",
+        "activities": "Activity timeline"
+      },
+      "metrics": {
+        "date": "Date of metrics",
+        "server": "Server performance",
+        "database": "Database performance",
+        "api": "API statistics",
+        "performance": "System performance",
+        "users": "User statistics",
+        "errors": "Error statistics"
+      }
+    },
+    "flow": {
+      "user_login": [
+        "1. User logs in via Auth.jsx",
+        "2. Backend logs auth event",
+        "3. MonitoringService.initializeSession() called",
+        "4. Session file created in monitoring/sessions/",
+        "5. Page view tracking started"
+      ],
+      "user_action": [
+        "1. User performs action (click, submit, etc)",
+        "2. Frontend calls MonitoringService.trackAction()",
+        "3. Event sent to /api/monitoring/track endpoint",
+        "4. Backend logs event to monitoring/logs/",
+        "5. Session file updated with action"
+      ],
+      "user_logout": [
+        "1. User logs out",
+        "2. MonitoringService.endSession() called",
+        "3. Session closed and duration calculated",
+        "4. Analytics data generated",
+        "5. Session file saved with completion timestamp"
+      ]
+    },
+    "performance_considerations": {
+      "non_blocking": "All monitoring events tracked asynchronously",
+      "no_impact": "Monitoring does not block user interactions",
+      "batch_writes": "Events batched to file system",
+      "efficient_storage": "JSON format for easy parsing and analysis"
+    },
+    "security": {
+      "session_isolation": "Each session tracked independently",
+      "user_identification": "User ID and name tracked for accountability",
+      "ip_logging": "IP address logged for security",
+      "no_sensitive_data": "Passwords and tokens not logged"
+    },
+    "scalability": {
+      "file_based": "Simple file-based storage easy to scale",
+      "rotation": "Logs rotated daily for performance",
+      "compression": "Old logs can be archived",
+      "migration": "Easy to migrate to database if needed"
+    }
+  }
+}

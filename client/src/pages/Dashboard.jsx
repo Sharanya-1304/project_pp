@@ -1,62 +1,114 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AppContext } from "../AppContext";
+import axios from "axios";
 
 export default function Dashboard() {
   const { user } = useContext(AppContext);
+  const [stats, setStats] = useState(null);
+  const [topPlayers, setTopPlayers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      const token = localStorage.getItem("token") || localStorage.getItem("authToken");
+      
+      // Fetch top players
+      try {
+        const leaderResponse = await axios.get(`${API_URL}/api/user/leaderboard?limit=5`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        // API returns 'data' field with users array
+        const players = leaderResponse.data.data || leaderResponse.data.users || [];
+        setTopPlayers(players);
+      } catch (err) {
+        console.log("Leaderboard data not available:", err.message);
+      }
+    } catch (error) {
+      console.error("Failed to fetch dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!user) return null;
 
-  const stats = [
-    { label: "Posts", value: user.posts || 0, icon: "📝", color: "from-blue-400 to-blue-600" },
-    { label: "Votes", value: user.votes || 0, icon: "👍", color: "from-green-400 to-green-600" },
-    { label: "Feedback", value: user.feedbacks || 0, icon: "💬", color: "from-yellow-400 to-yellow-600" },
-    { label: "Rank", value: `#${user.rank || 0}`, icon: "🏅", color: "from-purple-400 to-purple-600" }
-  ];
-
-  const recentActivity = [
-    { action: "Created a new post", time: "2 hours ago" },
-    { action: "Received 5 votes", time: "1 day ago" },
-    { action: "Completed a puzzle", time: "3 days ago" },
-    { action: "Earned a badge", time: "1 week ago" }
+  const statCards = [
+    {
+      label: "Posts",
+      value: user.posts || 0,
+      icon: "📝",
+      color: "from-blue-500 to-blue-600",
+      bgColor: "bg-blue-50",
+    },
+    {
+      label: "Votes",
+      value: user.votes || 0,
+      icon: "👍",
+      color: "from-green-500 to-green-600",
+      bgColor: "bg-green-50",
+    },
+    {
+      label: "Feedback",
+      value: user.feedbacks || 0,
+      icon: "💬",
+      color: "from-purple-500 to-purple-600",
+      bgColor: "bg-purple-50",
+    },
+    {
+      label: "Rank",
+      value: `#${user.rank || 0}`,
+      icon: "🏆",
+      color: "from-yellow-500 to-yellow-600",
+      bgColor: "bg-yellow-50",
+    }
   ];
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">Dashboard</h2>
-        <p className="text-gray-600">Welcome back, {user.name}! 👋</p>
+    <div className="space-y-8 pb-10">
+      {/* Welcome Header */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-8 shadow-lg">
+        <h1 className="text-4xl font-bold mb-2">Welcome back, {user.name}! 👋</h1>
+        <p className="text-indigo-100">Here's your performance overview</p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {statCards.map((stat, index) => (
           <div
             key={index}
-            className={`bg-gradient-to-br ${stat.color} rounded-lg shadow-lg p-6 text-white transform hover:scale-105 transition duration-200`}
+            className={`${stat.bgColor} rounded-xl p-6 shadow-md hover:shadow-lg transition transform hover:scale-105`}
           >
             <div className="flex items-center justify-between mb-4">
-              <span className="text-4xl">{stat.icon}</span>
-              <div className="text-right">
-                <div className="text-sm font-medium opacity-80">{stat.label}</div>
-                <div className="text-3xl font-bold">{stat.value}</div>
-              </div>
+              <h3 className="text-gray-700 font-semibold text-sm">{stat.label}</h3>
+              <span className="text-3xl">{stat.icon}</span>
+            </div>
+            <div className="mb-2">
+              <p className={`text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+                {stat.value}
+              </p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Analytics Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Activity Chart Placeholder */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Weekly Activity</h3>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Activity Chart */}
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Weekly Activity</h2>
           <div className="h-48 flex items-end justify-around gap-2">
             {[40, 60, 45, 80, 70, 55, 90].map((val, i) => (
               <div
                 key={i}
-                className="w-full bg-gradient-to-t from-blue-500 to-blue-300 rounded-t-lg hover:from-blue-600 hover:to-blue-400 transition"
+                className="flex-1 bg-gradient-to-t from-indigo-500 to-indigo-300 rounded-t-lg hover:from-indigo-600 hover:to-indigo-400 transition cursor-pointer"
                 style={{ height: `${val}%` }}
-                title={`Day ${i + 1}: ${val}%`}
+                title={`Day ${i + 1}`}
               />
             ))}
           </div>
@@ -65,41 +117,81 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Recent Activity</h3>
-          <div className="space-y-3">
-            {recentActivity.map((activity, index) => (
-              <div key={index} className="flex items-center gap-3 pb-3 border-b last:border-b-0">
-                <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                <div className="flex-1">
-                  <p className="text-gray-700 font-medium">{activity.action}</p>
-                  <p className="text-sm text-gray-500">{activity.time}</p>
-                </div>
-              </div>
-            ))}
+        {/* Quick Stats */}
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Profile Info</h2>
+
+          <div className="space-y-4">
+            <div className="p-4 bg-indigo-50 rounded-lg">
+              <p className="text-xs text-gray-600 font-semibold">NAME</p>
+              <p className="text-lg font-bold text-gray-800">{user.name}</p>
+            </div>
+
+            <div className="p-4 bg-purple-50 rounded-lg">
+              <p className="text-xs text-gray-600 font-semibold">ROLL</p>
+              <p className="text-sm font-semibold text-gray-800">{user.roll}</p>
+            </div>
+
+            <div className="p-4 bg-green-50 rounded-lg">
+              <p className="text-xs text-gray-600 font-semibold">STATUS</p>
+              <p className="text-sm font-bold">
+                <span className={user.isVerified ? "text-green-600" : "text-red-600"}>
+                  {user.isVerified ? "✅ Verified" : "❌ Unverified"}
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Performance Metrics */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Performance Metrics</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4">
-            <div className="text-4xl font-bold text-blue-600 mb-2">{Math.round((user.votes / (user.votes + user.feedbacks + 1)) * 100)}%</div>
-            <p className="text-gray-600">Engagement Rate</p>
-          </div>
-          <div className="text-center p-4">
-            <div className="text-4xl font-bold text-green-600 mb-2">{user.posts}</div>
-            <p className="text-gray-600">Total Contributions</p>
-          </div>
-          <div className="text-center p-4">
-            <div className="text-4xl font-bold text-purple-600 mb-2">⭐ 4.5</div>
-            <p className="text-gray-600">Average Rating</p>
+      {/* Top Players Section */}
+      {topPlayers.length > 0 && (
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">🏆 Top Players</h2>
+
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b-2 border-gray-200">
+                  <th className="text-left py-3 px-4 text-gray-700 font-semibold">Rank</th>
+                  <th className="text-left py-3 px-4 text-gray-700 font-semibold">Player</th>
+                  <th className="text-center py-3 px-4 text-gray-700 font-semibold">Posts</th>
+                  <th className="text-center py-3 px-4 text-gray-700 font-semibold">Votes</th>
+                  <th className="text-center py-3 px-4 text-gray-700 font-semibold">Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topPlayers.map((player, index) => (
+                  <tr key={player._id} className="border-b border-gray-100 hover:bg-gray-50 transition">
+                    <td className="py-4 px-4">
+                      <span className="text-xl font-bold">
+                        {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `#${index + 1}`}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4">
+                      <div>
+                        <p className="font-semibold text-gray-800">{player.name}</p>
+                        <p className="text-xs text-gray-500">{player.roll}</p>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-center text-gray-700 font-semibold">
+                      {player.posts}
+                    </td>
+                    <td className="py-4 px-4 text-center text-gray-700 font-semibold">
+                      {player.votes}
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent font-bold">
+                        {(player.votes * 10 + player.posts * 5) || 0}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -1,18 +1,21 @@
 import { useContext, useState } from "react";
 import { AppContext } from "../AppContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Settings() {
   const { user, setUser } = useContext(AppContext);
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("profile");
   const [theme, setTheme] = useState("light");
-  const [name, setName] = useState(user ? user.name : "");
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(true);
+  const [privacy, setPrivacy] = useState("public");
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   if (!user) return null;
 
   function handleSave() {
-    setUser({ ...user, name });
     setSuccess("Settings saved successfully!");
     setTimeout(() => setSuccess(""), 3000);
   }
@@ -23,162 +26,314 @@ export default function Settings() {
     setTimeout(() => setSuccess(""), 3000);
   }
 
+  function handlePasswordChange() {
+    // In a real app, this would trigger a password reset flow
+    navigate("/forgot-password");
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    setUser(null);
+    setSuccess("Logged out successfully!");
+    setTimeout(() => navigate("/login"), 1500);
+  }
+
   function handleReset() {
     if (window.confirm("Are you sure you want to reset all settings to default?")) {
       setTheme("light");
       setNotificationsEnabled(true);
       setEmailUpdates(true);
+      setPrivacy("public");
       setSuccess("Settings reset to default!");
       setTimeout(() => setSuccess(""), 3000);
     }
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">Settings</h2>
-        <p className="text-gray-600">Manage your account and preferences</p>
+    <div className="space-y-8 pb-10">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-8 shadow-lg">
+        <h1 className="text-4xl font-bold mb-2">⚙️ Settings</h1>
+        <p className="text-indigo-100">Manage your account and preferences</p>
       </div>
 
+      {/* Messages */}
       {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-          {success}
+        <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
+          <p className="text-green-700 font-semibold">✅ {success}</p>
+        </div>
+      )}
+      {error && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+          <p className="text-red-700 font-semibold">⚠️ {error}</p>
         </div>
       )}
 
+      {/* Tabs */}
+      <div className="flex border-b border-gray-300 gap-4">
+        {[
+          { id: "profile", label: "👤 Profile", icon: "👤" },
+          { id: "security", label: "🔒 Security", icon: "🔒" },
+          { id: "notifications", label: "🔔 Notifications", icon: "🔔" },
+          { id: "privacy", label: "👁️ Privacy", icon: "👁️" },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-6 py-3 font-semibold transition border-b-2 ${
+              activeTab === tab.id
+                ? "border-indigo-600 text-indigo-600"
+                : "border-transparent text-gray-600 hover:text-gray-800"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {/* Profile Settings */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Profile Settings</h3>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Display Name
-            </label>
-            <input
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-            />
+      {activeTab === "profile" && (
+        <div className="bg-white rounded-xl shadow-md p-6 space-y-6">
+          <h2 className="text-2xl font-bold text-gray-800">Profile Settings</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Full Name
+              </label>
+              <input
+                type="text"
+                defaultValue={user.name}
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Roll Number
+              </label>
+              <input
+                type="text"
+                defaultValue={user.roll}
+                disabled
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed text-gray-600"
+              />
+              <p className="text-xs text-gray-500 mt-1">Roll number cannot be changed</p>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                defaultValue={user.email}
+                disabled
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed text-gray-600"
+              />
+              <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Bio (Optional)
+              </label>
+              <textarea
+                defaultValue={user.bio || ""}
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none transition resize-none h-24"
+                placeholder="Tell us about yourself..."
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
-            <input
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
-              value={user.email}
-              disabled
-            />
-            <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
-          </div>
+
           <button
             onClick={handleSave}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-200 font-medium"
+            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold"
           >
-            Save Profile
+            💾 Save Profile
           </button>
         </div>
-      </div>
+      )}
 
-      {/* Appearance Settings */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Appearance</h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <p className="font-medium text-gray-800">Theme</p>
-              <p className="text-sm text-gray-600">
-                Current: {theme === "light" ? "Light Mode" : "Dark Mode"}
-              </p>
+      {/* Security Settings */}
+      {activeTab === "security" && (
+        <div className="bg-white rounded-xl shadow-md p-6 space-y-6">
+          <h2 className="text-2xl font-bold text-gray-800">Security Settings</h2>
+
+          <div className="border-2 border-gray-200 rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-1">Password</h3>
+                <p className="text-sm text-gray-600">Change your password regularly to keep your account secure</p>
+              </div>
+              <button
+                onClick={handlePasswordChange}
+                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition font-semibold"
+              >
+                🔄 Change Password
+              </button>
             </div>
-            <button
-              onClick={toggleTheme}
-              className={`px-6 py-2 rounded-lg transition duration-200 font-medium ${
-                theme === "light"
-                  ? "bg-gray-800 text-white hover:bg-gray-900"
-                  : "bg-yellow-400 text-gray-900 hover:bg-yellow-500"
-              }`}
-            >
-              {theme === "light" ? "Dark Mode" : "Light Mode"}
-            </button>
+          </div>
+
+          <div className="border-2 border-gray-200 rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-1">Two-Factor Authentication</h3>
+                <p className="text-sm text-gray-600">Add an extra layer of security to your account</p>
+              </div>
+              <button
+                disabled
+                className="px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed font-semibold"
+              >
+                Coming Soon
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
+            <p className="text-blue-900 font-semibold">🔐 Account Status</p>
+            <p className="text-blue-800 mt-2">
+              ✅ Your account is secure and verified
+            </p>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Notification Settings */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Notifications</h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <p className="font-medium text-gray-800">Enable Notifications</p>
-              <p className="text-sm text-gray-600">Get notified about updates</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={notificationsEnabled}
-                onChange={() =>
-                  setNotificationsEnabled(!notificationsEnabled)
-                }
-              />
-              <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
+      {activeTab === "notifications" && (
+        <div className="bg-white rounded-xl shadow-md p-6 space-y-6">
+          <h2 className="text-2xl font-bold text-gray-800">Notification Preferences</h2>
+
+          <div className="space-y-4">
+            {[
+              {
+                title: "Email Notifications",
+                desc: "Receive email when someone interacts with your posts",
+                icon: "📧",
+              },
+              {
+                title: "Weekly Digest",
+                desc: "Get a weekly summary of your activity and top posts",
+                icon: "📰",
+              },
+              {
+                title: "Leaderboard Updates",
+                desc: "Notify me when I rank up or down in leaderboard",
+                icon: "📊",
+              },
+              {
+                title: "Community Activity",
+                desc: "Updates about new posts and discussions in my interests",
+                icon: "👥",
+              },
+            ].map((notif, idx) => (
+              <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div>
+                  <p className="font-semibold text-gray-800">{notif.icon} {notif.title}</p>
+                  <p className="text-sm text-gray-600">{notif.desc}</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    defaultChecked={notificationsEnabled}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
+              </div>
+            ))}
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <p className="font-medium text-gray-800">Email Updates</p>
-              <p className="text-sm text-gray-600">Receive weekly digest emails</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={emailUpdates}
-                onChange={() => setEmailUpdates(!emailUpdates)}
-              />
-              <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {/* Danger Zone */}
-      <div className="bg-red-50 border-2 border-red-200 rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-bold text-red-800 mb-4">Danger Zone</h3>
-        <div className="space-y-4">
           <button
-            onClick={handleReset}
-            className="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition duration-200 font-medium"
+            onClick={handleSave}
+            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold w-full"
           >
-            Reset All Settings
+            💾 Save Preferences
           </button>
-          <p className="text-sm text-red-700">
-            This action will reset all settings to their default values.
-          </p>
+        </div>
+      )}
+
+      {/* Privacy Settings */}
+      {activeTab === "privacy" && (
+        <div className="bg-white rounded-xl shadow-md p-6 space-y-6">
+          <h2 className="text-2xl font-bold text-gray-800">Privacy Settings</h2>
+
+          <div className="space-y-4">
+            <div className="border-2 border-gray-200 rounded-lg p-6">
+              <h3 className="font-semibold text-gray-800 mb-3">Profile Visibility</h3>
+              {["Public", "Friends Only", "Private"].map((option) => (
+                <label key={option} className="flex items-center gap-3 mb-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="privacy"
+                    value={option.toLowerCase()}
+                    defaultChecked={option === "Public"}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-gray-800">{option}</span>
+                </label>
+              ))}
+            </div>
+
+            <div className="border-2 border-gray-200 rounded-lg p-6">
+              <h3 className="font-semibold text-gray-800 mb-3">Data Sharing</h3>
+              <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="text-gray-800">Allow others to see my posts</span>
+                <input type="checkbox" defaultChecked className="w-4 h-4" />
+              </label>
+            </div>
+          </div>
+
+          <button
+            onClick={handleSave}
+            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold w-full"
+          >
+            💾 Save Privacy Settings
+          </button>
+        </div>
+      )}
+
+      {/* Account Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-orange-50 border-l-4 border-orange-500 rounded-lg p-6">
+          <h3 className="text-lg font-bold text-orange-900 mb-3">🔐 Advanced</h3>
+          <button
+            onClick={() => alert("Data export coming soon!")}
+            className="w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-semibold"
+          >
+            📥 Download My Data
+          </button>
+        </div>
+
+        <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-6">
+          <h3 className="text-lg font-bold text-red-900 mb-3">⚠️ Danger Zone</h3>
+          <button
+            onClick={handleLogout}
+            className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold"
+          >
+            🚪 Logout
+          </button>
         </div>
       </div>
 
-      {/* Information */}
-      <div className="bg-blue-50 rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-bold text-blue-800 mb-4">Account Information</h3>
-        <div className="space-y-2 text-gray-700">
-          <p>
-            <span className="font-semibold">Member Since:</span> January 2025
-          </p>
-          <p>
-            <span className="font-semibold">Account Status:</span>
-            <span className="text-green-600 font-bold ml-2">Active</span>
-          </p>
-          <p>
-            <span className="font-semibold">Current Role:</span> {user.role}
-          </p>
-          <p>
-            <span className="font-semibold">Rank:</span> #{user.rank || 0}
-          </p>
+      {/* Account Info */}
+      <div className="bg-indigo-50 border-l-4 border-indigo-500 rounded-lg p-6">
+        <h3 className="text-lg font-bold text-indigo-900 mb-4">📋 Account Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <p className="text-xs font-semibold text-indigo-700 mb-1">MEMBER SINCE</p>
+            <p className="text-gray-800 font-semibold">January 2025</p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-indigo-700 mb-1">ACCOUNT STATUS</p>
+            <p className="text-green-600 font-semibold">✅ Active</p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-indigo-700 mb-1">CURRENT RANK</p>
+            <p className="text-gray-800 font-semibold">#{user.rank || "N/A"}</p>
+          </div>
         </div>
       </div>
     </div>
